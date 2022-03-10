@@ -13,7 +13,7 @@ email = "testingsendingemails111@gmail.com"
 password = "PetrHanzl123"
 
 # Path to message template
-html_body_template = "/Users/petrhanzl/Projects/School/mendelu_discord_bot/docs/email-format.html"
+html_body_template = "docs/email-format.html"
 
 
 # Sends email with verification token

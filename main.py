@@ -13,7 +13,7 @@ if __name__ == '__main__':
     except sqlite3.OperationalError:
         logging.debug("Table is already created")
     except Exception as ex:
-        logging.critical("Unspecified error has occurred: " + str(ex))
+        logging.error("Unspecified error has occurred: " + str(ex))
 
     send_mail("petrhanzl33@gmail.com", 111456848648486648)
 
