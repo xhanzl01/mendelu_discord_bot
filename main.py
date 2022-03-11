@@ -1,10 +1,8 @@
 import logging
 import sqlite3
-from student import Student
-from verification import send_mail
 
+from bot import bot
 from db import db
-
 
 if __name__ == '__main__':
     try:
@@ -15,5 +13,5 @@ if __name__ == '__main__':
     except Exception as ex:
         logging.error("Unspecified error has occurred: " + str(ex))
 
-    send_mail("petrhanzl33@gmail.com", 111456848648486648)
 
+    bot.start_bot()

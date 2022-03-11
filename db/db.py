@@ -15,14 +15,17 @@ type_of_studies bc/ing
 
 
 def init_db():
-    global conn
-    global cur
+    #global conn
+    #global cur
     create_db_table()
 
 
 def create_db_table():
     cur.execute("""
                 CREATE TABLE students(
+                name text,
+                surname text,
+                discord_id text,
                 login text, 
                 uid integer, 
                 year_of_studies integer, 
@@ -46,11 +49,7 @@ def check_for_existing_uid(uid):
     return True
 
 
-def insert_new_student(student):
-    if check_for_existing_uid(student.uid):
-        logging.warning("Someone tried verified with uid that is already in the table: " + student.login + " " + str(student.uid))
-        return
-
-    query = """INSERT INTO students VALUES(?, ?, ?, ?, ?)"""
-    data = [student.login, student.uid, student.year_of_studies, student.program, student.type_of_studies]
+def insert_new_student(name, surname, discord_id, login, uid, year_of_studies, program, type_of_studies):
+    query = """INSERT INTO students VALUES(?, ?, ?, ?, ?, ?, ?, ?)"""
+    data = [name, surname, discord_id, login, uid, year_of_studies, program, type_of_studies]
     cur.execute(query, data)
