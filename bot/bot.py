@@ -1,21 +1,14 @@
-import logging
-from verification import verification
-from db.db import check_for_existing_uid, insert_new_student
 import discord
+import logging
+
+from db.db import check_for_existing_uid, insert_new_student
 
 bot_token = "OTUxNTQwNTc3NDU4MDkwMDg1.Yio9OA.VlMspAKfMSBI2erNTtbAvhz5vfg"
 # Initiating discord client
 client = discord.Client()
 guild = None
 
-
-def has_role(message, roleName):
-    """role = discord.utils.get(message.author.guild.roles, name=roleName)
-    if role in message.author.roles:
-        return True
-    return False"""
-
-
+"""
 @client.event
 async def verify(message):
     split_message = message.content.split(" ")
@@ -57,9 +50,9 @@ async def verify(message):
 
         role = discord.utils.get(message.author.guild.roles, name="Verified")
         await message.author.add_roles(role)
-        logging.debug("New Verification for user " + message.author)
+        logging.info("New Verification for user " + message.author)
 
-
+"""
 @client.event
 async def get_help(message):
     await message.channel.send("help")
@@ -90,12 +83,22 @@ async def handle_message(message):
     pass
 
 
+@client.event
+async def write_message(message):
+    if not "Moderator" in message.author.roles:
+        return
+    split_message = message.split(";")
+    await message.channel.send(split_message[1])
+    await message.delete()
+
+
 config = {
-    "!verify": verify,
+#    "!verify": verify,
     "!help": get_help,
     "!meme": get_meme,
     "!week": get_week,
     "!uid": get_uid,
+    "!write": write_message,
 }
 
 
@@ -103,18 +106,16 @@ def getList(dict):
     return dict.keys()
 
 
-def start_bot():
-    client.run(bot_token)
-
 
 @client.event
 async def on_ready():
-    logging.debug(f"{client} has logged in!")
+    logging.info(f"{client} has logged in!")
+    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='Me Robot'))
 
 
 @client.event
 async def on_member_join(member):
-    logging.debug(f"{member} has logged to the server!")
+    logging.info(f"{member} has logged to the server!")
     role = discord.utils.get(member.guild.roles, name="Unverified")
     await member.add_roles(role)
 
@@ -127,3 +128,13 @@ async def on_message(message):
     msg = message.content.split(" ")
     if msg[0] in config:
         await config[msg[0]](message)
+
+
+@client.event
+async def on_raw_reaction_add(payload):
+    pass
+
+
+def start_bot():
+    client.run(bot_token)
+

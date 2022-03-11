@@ -40,7 +40,7 @@ def send_mail(receiver):
     # Finally, sending a message with the token
     str_msg = message.as_string()
     server.sendmail(email, receiver, str_msg)
-    logging.debug(f"E-mail with token {token} sent to {receiver}")
+    logging.info(f"E-mail with token {token} sent to {receiver}")
 
 
 def is_valid_student(uid):

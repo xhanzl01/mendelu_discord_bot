@@ -1,17 +1,17 @@
 import logging
 import sqlite3
 
-from bot import bot
+from bot.bot import start_bot
+from bot.commands import init_commands
 from db import db
-
 if __name__ == '__main__':
     try:
         db.init_db()
-        logging.debug("Creating table and inserting data")
+        logging.info("Creating table and inserting data")
     except sqlite3.OperationalError:
-        logging.debug("Table is already created")
+        logging.info("Table is already created")
     except Exception as ex:
         logging.error("Unspecified error has occurred: " + str(ex))
 
-
-    bot.start_bot()
+    init_commands()
+    # start_bot()
