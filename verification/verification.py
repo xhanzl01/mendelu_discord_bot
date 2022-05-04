@@ -14,9 +14,9 @@ password = "PetrHanzl123"
 html_body_template = "docs/email-format.html"
 
 
+
 # Sends email with verification token
-def send_mail(receiver):
-    token = random.randint(0, 2147483648)
+def send_mail(receiver, token):
     with open(html_body_template, "r") as f:
         template = f.read()
 
@@ -48,7 +48,7 @@ def is_valid_student(uid):
                      + date.strftime(date.today(), "%d.%m.%Y") + ";lang=cz")
     if "ano" in r.text:
         return "john doe"
-    return "john doe"
+    return
 
 
 def is_valid_email(mail):
