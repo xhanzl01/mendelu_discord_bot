@@ -23,7 +23,7 @@ async def give_role(ctx, user: discord.Member, role: discord.Role):
     await user.add_roles(role)
 
 
-# Overloading help command TODO FINISH
+# Overloading help command TODO FINISH THIS
 @bot.command(pass_context=True)
 @commands.has_any_role("Verified", "Unverified")
 async def help(ctx):
