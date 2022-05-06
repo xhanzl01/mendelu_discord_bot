@@ -76,14 +76,14 @@ async def verify(ctx, email, uid):
     split_fullname = fullname.split(" ")
     if len(split_fullname) < 2:
         logging.warning("Too short fullname from UID: " + uid)
-        insert_new_student(fullname, "", ctx.message.author.id, email.split("@")[0], uid, 0, "", "", random_token)
+        insert_new_student(fullname, "", ctx.message.author.id, email.split("@")[0], uid, 0, "", random_token)
     elif len(split_fullname) > 2:
         logging.warning("Too long fullname from UID: " + uid)
-        insert_new_student(split_fullname[:-1], split_fullname[-1], ctx.message.author.id, email.split("@")[0], uid, 0,
-                           "", "", random_token)
+        insert_new_student(split_fullname[:-1], split_fullname[-1], ctx.message.author.id, email.split("@")[0],
+                           uid, 0, "", random_token)
     else:
-        insert_new_student(split_fullname[0], split_fullname[1], ctx.message.author.id, email.split("@")[0], uid, 0, "",
-                           "", random_token)
+        insert_new_student(split_fullname[0], split_fullname[1], ctx.message.author.id, email.split("@")[0],
+                           uid, 0, "", random_token)
 
 
 
@@ -106,7 +106,7 @@ async def token(ctx, message_token):
                 "It seems like you did not verify. Please head over to the #verify channel and "
                 "verify there.")
         # check if token is correct
-        elif student[-1] == int_token:
+        elif student[-2] == int_token:
             # find role in the roles pool
             verified_role = discord.utils.get(ctx.message.author.guild.roles, name="Verified")
             unverified_role = discord.utils.get(ctx.message.author.guild.roles, name="Unverified")

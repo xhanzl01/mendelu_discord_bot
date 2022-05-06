@@ -1,3 +1,4 @@
+import csv
 import logging
 import sqlite3
 from config import data_fouss
@@ -32,11 +33,10 @@ def create_db_table():
                 uid integer, 
                 year_of_studies integer, 
                 program text, 
-                type_of_studies text,
-                verification_token integer 
+                verification_token integer, 
+                karma integer 
                 )""")
     conn.commit()
-    conn.close()
 
 
 # checks whether record with given uid exists
@@ -52,17 +52,19 @@ def check_for_existing_uid(uid):
     return True
 
 
-def insert_new_student(name, surname, discord_id, login, uid, year_of_studies, program, type_of_studies,
-                       verification_token):
+def insert_new_student(name, surname, discord_id, login, uid, year_of_studies, program, verification_token):
     query = """INSERT INTO students VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)"""
-    data = [name, surname, discord_id, login, uid, year_of_studies, program, type_of_studies, verification_token]
+    data = [name, surname, discord_id, login, uid, year_of_studies, program, verification_token, 0]
     cur.execute(query, data)
+    conn.commit()
 
 
 def return_all_students_in_db():
     query = "SELECT * FROM students"
     cur.execute(query)
-    return cur.fetchall()
+    students = cur.fetchall()
+    return students
+
 
 
 def get_token(discord_id):
@@ -77,14 +79,6 @@ def update_studies(db_row, updated_arg, discord_id_arg):
     query = f"""UPDATE students SET {db_row} = ? WHERE discord_id = ?"""
     data = [updated_arg, discord_id_arg]
     cur.execute(query, data)
-    logging.info(get_token(discord_id_arg))
+    logging.info("Change of student info: " + get_token(discord_id_arg))
+    conn.commit()
 
-
-def insert_fouss():
-    # query = """INSERT INTO students(
-    #         name,surname,discord_id,login,uid,year_of_studies, program, type_of_studies, verification_token)
-    #         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
-    #         """
-    # cur.execute(query, data_fouss)
-    # print(return_all_students_in_db())
-    pass
