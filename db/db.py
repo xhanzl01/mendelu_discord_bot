@@ -82,3 +82,20 @@ def update_studies(db_row, updated_arg, discord_id_arg):
     logging.info("Change of student info: " + get_token(discord_id_arg))
     conn.commit()
 
+
+def insert_fouss():
+    # query = """INSERT INTO students(
+    #         name,surname,discord_id,login,uid,year_of_studies, program, verification_token, karma)
+    #         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
+    #         """
+    # cur.execute(query, data_fouss)
+    # conn.commit()
+    # print(return_all_students_in_db())
+    pass
+
+
+def migrate_old_db_data():
+    data_file = open("docs/mendelu_old_db_data.csv")
+    rows = csv.reader(data_file)
+    cur.executemany("INSERT INTO students VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
+    conn.commit()

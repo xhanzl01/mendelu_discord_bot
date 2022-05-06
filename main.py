@@ -2,9 +2,10 @@ import logging
 import sqlite3
 import sys
 
-from bot.bot import start_bot
 from bot.commands import init_commands
 from db import db
+
+# TODO put everything into try catch blocks and log errors into file
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)

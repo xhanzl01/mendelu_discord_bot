@@ -19,7 +19,7 @@ def send_mail(receiver, token):
 
     # SMTP server for email service
     server = smtplib.SMTP_SSL("smtp.seznam.cz")
-    server.login(os.environ["EMAIL"], os.environ["EMAIL_PASS"])
+    server.login(email, password)
 
     # Creating a message
     html = template.replace("{tokenplaceholder}", str(token))
