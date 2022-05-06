@@ -5,9 +5,13 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 from verification import verification
-from db.db import check_for_existing_uid, insert_new_student
+from db.db import check_for_existing_uid, insert_new_student, return_all_students_in_db, get_token
+from features.features import add_permission_to_room, add_classification
 
-bot = commands.Bot(command_prefix='$', help_command=None)
+intents = discord.Intents.all()
+discord.member = True
+
+bot = commands.Bot(command_prefix='!', help_command=None, intents=intents)
 bot_token = "OTUxNTQwNTc3NDU4MDkwMDg1.Yio9OA.VlMspAKfMSBI2erNTtbAvhz5vfg"
 
 
@@ -42,49 +46,86 @@ async def help(ctx):
 @bot.command()
 @commands.has_role("Unverified")
 async def verify(ctx, email, uid):
+    await ctx.message.delete()
     # Check if message was sent to verify channel
     if ctx.channel.name != "verify":
-        ctx.message.author.send("Use verify channel for this command please.")
+        ctx.author.send("Use verify channel for this command please.")
         return
     # Check whether given uid is bind
     fullname = verification.is_valid_student(uid)
-    if fullname == 0:
-        await ctx.message.author.send("Wrong UID! It looks like this on your ISIC: 10012345")
+    if fullname == 0 or fullname is None:
+        await ctx.author.send("Wrong UID! It looks like this on your ISIC: 10012345")
         return
     # whether uid is not used already
     if check_for_existing_uid(uid):
-        logging.CRITICAL("Someone tried to use UID that is already used: " + uid)
-        await ctx.message.author.send("This UID is already used, please contact a moderator.")
+        logging.critical("Someone tried to use UID that is already used: " + uid)
+        await ctx.author.send("This UID is already used, please contact a moderator.")
         return
     # whether email is in valid form
     if not verification.is_valid_email(email):
-        await ctx.message.author.send("Wrong e-mail! It must be in this form: xlogin@mendelu.cz")
+        await ctx.author.send("Wrong e-mail! It must be in this form: xlogin@mendelu.cz")
         return
 
     # Sending verification email with token
-    await ctx.message.author.send(f"Sending verification email to address `{email}`")
-    token = randint(0, 2147483648)
-    verification.send_mail(email, token)
+    await ctx.author.send(f"Sending verification email to address `{email}`")
+    random_token = randint(1, 2147483648)
 
-    def check(message):
-        return message.author == ctx.message.author and message.content == token
+    verification.send_mail(email, random_token)
 
-    # TODO TOKEN HANDLING
-    msg = await bot.wait_for("message", check=check)
-    ctx.message.author.send(msg)
-    if 1:
-        split_fullname = fullname.split(" ")
-        if len(split_fullname) < 2:
-            logging.WARNING("Too short fullname from UID: " + uid)
-            insert_new_student(fullname, "", ctx.message.author.id, email.split("@")[0], uid, 0, "", "")
-        if len(split_fullname) > 2:
-            logging.WARNING("Too long fullname from UID: " + uid)
-            insert_new_student(fullname[:-1], fullname[-1], ctx.message.author.id, email.split("@")[0], uid, 0, "", "")
-        insert_new_student(fullname[0], fullname[1], ctx.message.author.id, email.split("@")[0], uid, 0, "", "")
+    split_fullname = fullname.split(" ")
+    if len(split_fullname) < 2:
+        logging.warning("Too short fullname from UID: " + uid)
+        insert_new_student(fullname, "", ctx.message.author.id, email.split("@")[0], uid, 0, "", "", random_token)
+    elif len(split_fullname) > 2:
+        logging.warning("Too long fullname from UID: " + uid)
+        insert_new_student(split_fullname[:-1], split_fullname[-1], ctx.message.author.id, email.split("@")[0], uid, 0,
+                           "", "", random_token)
+    else:
+        insert_new_student(split_fullname[0], split_fullname[1], ctx.message.author.id, email.split("@")[0], uid, 0, "",
+                           "", random_token)
 
-        role = ctx.discord.utils.get(ctx.message.author.guild.roles, name="Verified")
-        await ctx.message.author.add_roles(role)
-        logging.info("New Verification for user " + ctx.message.author)
+
+
+@bot.command()
+@commands.has_role("Unverified")
+async def token(ctx, message_token):
+    # get token
+    try:
+        int_token = int(message_token)
+    except ValueError:
+        logging.error(f"ValueError while verifying %s, token: %s", str(ctx.author.name), str(message_token))
+        await ctx.message.author.send(
+            "The token you have send is not correct. The token must be a number. If you think this is "
+            "an error, please contact `F0uss#3807`.\n"
+            "If you do not have a token, please first use !verify command to get one.")
+    else:
+        student = get_token(ctx.message.author.id)[0]
+        if len(student) == 0:
+            await ctx.message.author.send(
+                "It seems like you did not verify. Please head over to the #verify channel and "
+                "verify there.")
+        # check if token is correct
+        elif student[-1] == int_token:
+            # find role in the roles pool
+            verified_role = discord.utils.get(ctx.message.author.guild.roles, name="Verified")
+            unverified_role = discord.utils.get(ctx.message.author.guild.roles, name="Unverified")
+
+            # give user Verified role and remove Unverified role
+            await ctx.message.author.add_roles(verified_role)
+            await ctx.message.author.remove_roles(unverified_role)
+
+            # send message user has promoted
+            logging.info("New Verification for user " + str(ctx.author.name))
+            try:
+                promotion_channel = bot.get_channel(951949130912129104)
+
+                await promotion_channel.send("New student has verified " + str(ctx.author.mention))
+            except Exception as ex:
+                print(ex)
+        else:
+            await ctx.message.author.send("Wrong token, the token was sent to your school email address. Check spam "
+                                          "folder if you dont see it. If you think you entered a correct token, "
+                                          "please contact `F0uss#3807`")
 
 
 @verify.error
@@ -108,7 +149,7 @@ async def on_ready():
 
 
 @bot.event
-async def on_member_join(member):
+async def on_member_join(member: discord.Member):
     logging.info(f"{member} has logged to the server!")
 
     # giving role "Unverified"
@@ -118,6 +159,23 @@ async def on_member_join(member):
     # sending welcome message
     welcome_channel = bot.get_channel(951947206682898432)
     await welcome_channel.send(f"{member.mention} just joined the server! Can they verify though?")
+    # send guide how to verify
+    verify_embed = discord.Embed(title="",
+                                 description="**Use both commands in the #verify channel on the server. DO NOT send "
+                                             "commands to the bot directly!\n\n** "
+                                             "To get started type !verify xname@mendelu.cz userid - where "
+                                             "xname@mendelu.cz is your university email and userid your ID Number on "
+                                             "your ISIC.\n\nThe bot will send you an email with a verification token "
+                                             "\n\n"
+                                             "After you receive the token use command !token *your token*.\n\n"
+                                             "If you did everything correctly, the bot will grant you permission to "
+                                             "the server",
+                                 colour=discord.Color.green())
+    verify_embed.set_author(name="Verification",
+                            icon_url="https://cdn4.iconfinder.com/data/icons/basic-ui-colour/512/ui-41-512.png")
+    verify_embed.set_footer(
+        text="If something goes wrong, write a message to one of the moderators (Koty97#6663, Ragnar#1517, Fouss#3807).")
+    await member.send(embed=verify_embed)
 
 
 @bot.event
@@ -132,37 +190,38 @@ async def on_member_update(before, after):
 
 
 @bot.event
-async def on_reaction_add(reaction: discord.Reaction, user: discord.User):
-    if reaction.message.channel.name != "rooms":
-        if reaction.emoji.name == "Thanks":
+async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
+    # is user trying to get permissions to rooms?
+    message: discord.Message = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)  # message that is reacted to
+    try:
+        channel: discord.TextChannel = bot.get_channel(payload.channel_id)  # channel that the reaction was added in
+        reaction = get(message.reactions, emoji=payload.emoji.name)
+        guild: discord.guild = bot.get_guild(payload.guild_id)
+        if channel.name == "classification":
+            messages = str.split(message.content, "\n")
+
+            for msg in messages:
+                # is this channel in the channel pool
+                emoji = str.split(msg)[0]
+                if str(emoji) == str(payload.emoji):
+                    await add_classification(guild, msg, payload.member)
+                    await reaction.remove(payload.member)
+        elif channel.name == "rooms":
+            messages = str.split(message.content, "\n")
+
+            for msg in messages:
+                # is this channel in the channel pool
+                emoji = str.split(msg)[0]
+                if str(emoji) == str(payload.emoji):
+                    await add_permission_to_room(guild, msg, channel, payload.member)
+        elif str(payload.emoji.name) == "Thanks":
             # todo karma
+            pass
+        else:
             return
-        return
-    messages = str.split(reaction.message.content, "\n")
-
-    for msg in messages:
-        # is this channel in the channel pool
-        emoji = str.split(msg)[0]
-        if str(emoji) == str(reaction.emoji):
-            channel_name = str.split(msg)[1]
-            channel = get(reaction.message.guild.channels, name=channel_name)
-            if not channel:
-                # if room doesn't exist, create it
-                channel = await reaction.message.guild.create_text_channel(name=channel_name,
-                                                                           category=reaction.message.channel.category)
-                overwrite = channel.overwrites_for(reaction.message.guild.get_role(951625866968985640))
-
-                # set all ppl not to see this channel
-                overwrite.send_messages = False
-                overwrite.read_messages = False
-                # verified
-                await channel.set_permissions(reaction.message.guild.get_role(951625866968985640), overwrite=overwrite)
-
-            overwrite = channel.overwrites_for(reaction.message.guild.get_role(951625866968985640))
-            # set only the user who reacted to see this channel
-            overwrite.send_messages = True
-            overwrite.read_messages = True
-            await channel.set_permissions(user, overwrite=overwrite)
+    except Exception as ex:
+        logging.error(f"reaction error in channel {message.channel.name} on message {message.content}"
+                      f" with reaction {payload.emoji.name}\n" + str(ex))
 
 
 @bot.event

@@ -1,4 +1,4 @@
-import random
+from config import email, password
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import smtplib
@@ -6,13 +6,8 @@ from datetime import date
 import logging
 import requests
 
-# Email credentials
-email = "testingsendingemails111@gmail.com"
-password = "PetrHanzl123"
-
 # Path to message template
 html_body_template = "docs/email-format.html"
-
 
 
 # Sends email with verification token
@@ -21,7 +16,7 @@ def send_mail(receiver, token):
         template = f.read()
 
     # SMTP server for email service
-    server = smtplib.SMTP_SSL("smtp.gmail.com")
+    server = smtplib.SMTP_SSL("smtp.seznam.cz")
     server.login(email, password)
 
     # Creating a message
