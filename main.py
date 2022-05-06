@@ -18,7 +18,7 @@ if __name__ == '__main__':
         logging.info("Creating table and inserting data")
     except sqlite3.OperationalError:
         logging.info("Table is already created")
-        db.insert_fouss()
+        # db.insert_fouss()
     except Exception as ex:
         logging.error("Unspecified error has occurred: " + str(ex))
 

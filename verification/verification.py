@@ -1,3 +1,5 @@
+import os
+
 from config import email, password
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -17,7 +19,7 @@ def send_mail(receiver, token):
 
     # SMTP server for email service
     server = smtplib.SMTP_SSL("smtp.seznam.cz")
-    server.login(email, password)
+    server.login(os.environ["EMAIL"], os.environ["EMAIL_PASS"])
 
     # Creating a message
     html = template.replace("{tokenplaceholder}", str(token))

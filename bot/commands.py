@@ -1,4 +1,5 @@
 import logging
+import os
 from random import randint
 
 import discord
@@ -12,7 +13,7 @@ intents = discord.Intents.all()
 discord.member = True
 
 bot = commands.Bot(command_prefix='!', help_command=None, intents=intents)
-bot_token = "OTUxNTQwNTc3NDU4MDkwMDg1.Yio9OA.VlMspAKfMSBI2erNTtbAvhz5vfg"
+bot_token = os.environ["CLIENT_KEY"]
 
 
 @bot.command(pass_context=True)

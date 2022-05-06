@@ -81,9 +81,10 @@ def update_studies(db_row, updated_arg, discord_id_arg):
 
 
 def insert_fouss():
-    query = """INSERT INTO students(
-            name,surname,discord_id,login,uid,year_of_studies, program, type_of_studies, verification_token)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """
-    cur.execute(query, data_fouss)
-    print(return_all_students_in_db())
+    # query = """INSERT INTO students(
+    #         name,surname,discord_id,login,uid,year_of_studies, program, type_of_studies, verification_token)
+    #         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
+    #         """
+    # cur.execute(query, data_fouss)
+    # print(return_all_students_in_db())
+    pass
