@@ -12,7 +12,7 @@ from features.features import add_permission_to_room, add_classification
 intents = discord.Intents.all()
 discord.member = True
 
-bot = commands.Bot(command_prefix='!', help_command=None, intents=intents)
+bot = commands.Bot(command_prefix='$', help_command=None, intents=intents)
 bot_token = "OTUxNTQwNTc3NDU4MDkwMDg1.Yio9OA.VlMspAKfMSBI2erNTtbAvhz5vfg"
 
 
