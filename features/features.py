@@ -8,21 +8,22 @@ from db.db import update_studies
 async def add_permission_to_room(guild: discord.Guild, msg, rooms_channel: discord.TextChannel, member: discord.Member):
     channel_name = str.split(msg)[1]
     channel = get(guild.channels, name=channel_name)
+    verified_role = get(guild.roles, name="Verified")
+
     if not channel:  # does the channel exist?
         # if room doesn't exist, create it
         channel = await guild.create_text_channel(name=channel_name, category=rooms_channel.category)
-        overwrite = channel.overwrites_for(guild.get_role(951625866968985640))
-
         # set all ppl not to see this channel
-        overwrite.send_messages = False
-        overwrite.read_messages = False
+        verified_overwrite = channel.overwrites_for(verified_role)
+        verified_overwrite.send_messages = False
+        verified_overwrite.read_messages = False
         # verified
-        await channel.set_permissions(guild.get_role(951625866968985640), overwrite=overwrite)
-    overwrite = channel.overwrites_for(guild.get_role(951625866968985640))
+        await channel.set_permissions(verified_role, overwrite=verified_overwrite)
     # set only the user who reacted to see this channel
-    overwrite.send_messages = True
-    overwrite.read_messages = True
-    await channel.set_permissions(member, overwrite=overwrite)
+    verified_overwrite = channel.overwrites_for(verified_role)
+    verified_overwrite.send_messages = True
+    verified_overwrite.read_messages = True
+    await channel.set_permissions(member, overwrite=verified_overwrite)
 
 
 async def add_classification(guild: discord.Guild, msg, member: discord.Member):

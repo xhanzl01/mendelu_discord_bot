@@ -131,6 +131,7 @@ async def token(ctx, message_token):
 
 @verify.error
 async def verify_error(ctx, error):
+    await ctx.message.delete()
     if str(error).startswith("email"):
         await ctx.message.author.send(
             "Wrong **email** format. Please use !verify like this: `!verify xlogin@mendelu.cz UID`")
@@ -157,10 +158,13 @@ async def on_member_join(member: discord.Member):
     role = discord.utils.get(member.guild.roles, name="Unverified")
     await member.add_roles(role)
 
-    # sending welcome message
-    welcome_channel = bot.get_channel(951947206682898432)
+    welcome_channel = get(member.guild.channels, name="welcome")
     await welcome_channel.send(f"{member.mention} just joined the server! Can they verify though?")
-    # send guide how to verify
+
+
+
+
+    # send verification guide
     verify_embed = discord.Embed(title="",
                                  description="**Use both commands in the #verify channel on the server. DO NOT send "
                                              "commands to the bot directly!\n\n** "
@@ -181,10 +185,10 @@ async def on_member_join(member: discord.Member):
 
 @bot.event
 async def on_member_update(before, after):
-    promotion_channel = bot.get_channel(951949130912129104)
+    promotion_channel = get(before.guild.channels, name="new-promotions")
     if "Unverified" in before.roles and "Verified" in after.roles:
         await promotion_channel.send(f"{after.mention} just verified and can use the server now!")
-    if "Bakalář" in after.roles:
+    if "BcOI" in after.roles:
         await promotion_channel.send(f"{after.mention} just promoted to Bc! Congratulations!")
     if "Helper" in after.roles:
         await promotion_channel.send(f"{after.mention} just promoted to Helper! Congratulations!")
@@ -215,13 +219,14 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
                 emoji = str.split(msg)[0]
                 if str(emoji) == str(payload.emoji):
                     await add_permission_to_room(guild, msg, channel, payload.member)
+                    return
         elif str(payload.emoji.name) == "Thanks":
             # todo karma
             pass
         else:
             return
     except Exception as ex:
-        logging.error(f"reaction error in channel {message.channel.name} on message {message.content}"
+        logging.error(f"reaction error in channel {message.channel.name} on message\n {message.content}\n"
                       f" with reaction {payload.emoji.name}\n" + str(ex))
 
 
@@ -230,6 +235,7 @@ async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
     room_channel = bot.get_channel(payload.channel_id)  # room channel
     message = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)  # message that is reacted to
     user = await bot.fetch_user(payload.user_id)  # user reacting to the message
+    verified_role = get(bot.get_guild(payload.guild_id).roles, name="Verified")
 
     if room_channel.name != "rooms":
         if payload.emoji.name == "Thanks":
@@ -241,7 +247,7 @@ async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
         channel_name = str.split(msg)[1]
         if str(emoji) == str(payload.emoji):
             channel = get(bot.get_guild(payload.guild_id).channels, name=channel_name)
-            overwrite = channel.overwrites_for(message.guild.get_role(951625866968985640))
+            overwrite = channel.overwrites_for(verified_role)
             # set only the user who reacted to see this channel
             overwrite.send_messages = False
             overwrite.read_messages = False
