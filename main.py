@@ -3,6 +3,7 @@ import sqlite3
 import sys
 
 from bot.bot import init_bot
+
 from db import db
 
 # TODO put everything into try catch blocks and log errors into file
@@ -23,3 +24,4 @@ if __name__ == '__main__':
         logging.error("Unspecified error has occurred: " + str(ex))
 
     init_bot()
+
