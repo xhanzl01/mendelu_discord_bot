@@ -183,6 +183,45 @@ async def on_member_join(member: discord.Member):
     await member.send(embed=verify_embed)
 
 
+# deletes permissions in all rooms for all members and roles. Deletes all members roles but "Unverified" and "Mod"
+@bot.command()
+@commands.has_role("Mod")
+async def delete_permissions_for_all_rooms(ctx):  # deletes permissions for all roles and members in all rooms.
+    roles_to_remove = []
+    for role in ctx.guild.roles:
+        if role.name.startswith("Mod") or role.name.startswith("SubMod") or role.name.startswith("Verified") or role.name.startswith("Unverified"):
+            roles_to_remove.append(role)
+
+    overwrite = discord.PermissionOverwrite()
+    overwrite.send_messages = False
+    overwrite.read_messages = False
+    for channel in ctx.guild.channels:
+        s = f"Deleting permissions in channel #{channel} "
+        for member in ctx.guild.members:
+            await channel.set_permissions(member, overwrite=overwrite)  # delete permissions in room for member
+            logging.info(s + f"for member {member}")
+        for role in ctx.guild.roles:
+            await channel.set_permissions(role, overwrite=overwrite)  # delete permissions in room for role
+            logging.info(s + f"for role {role}")
+
+
+@bot.command()
+@commands.has_role("Mod")
+async def remove_roles_from_all_users(ctx):  # removes all roles in all members
+
+    for role in ctx.guild.roles:
+        if not (role.name.startswith("Mod") or role.name.startswith("SubMod") or role.name.startswith("Verified")
+                or role.name.startswith("Unverified") or role.name.startswith("@everyone")
+                or role.name.startswith("PEFNet 2.0") or role.name.startswith("PEFNet 2.0")
+                or role.name.startswith("MendeluBot") or role.name.lower().startswith("bot")):
+            for member in ctx.guild.members:
+                logging.info(f"Removing role {role} from member {member}")
+                await member.remove_roles(role)  # remove role from member
+
+
+# todo nemazat verified a mod/submod
+
+
 @bot.event
 async def on_member_update(before, after):
     promotion_channel = get(before.guild.channels, name="new-promotions")
