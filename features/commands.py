@@ -1,5 +1,4 @@
 import logging
-import os
 from random import randint
 import discord
 from discord.ext import commands
@@ -21,18 +20,30 @@ def init_commands(bot):
     @commands.has_any_role("Verified", "Unverified")
     async def help(ctx):
         embed = discord.Embed(
-            colour=discord.Colour.orange()
+            colour=discord.Colour.blue()
         )
-        embed.set_author(name="Help")
-        embed.add_field(name="Test", value="testing shit", inline=False)
+        embed.set_author(name="Help", icon_url="https://www.clipartmax.com/png/full/11-113871_question-mark-clipart"
+                                               "-blue-question-mark-clip-art-free-blue-question-mark.png")
+
+        embed.add_field(name="!week", value="Returns number of the study week", inline=False)
 
         if ctx.message.author.guild_permissions.administrator or "Moderator" in ctx.message.author.roles:
-            embed.add_field(name="give_role",
-                            value="This command accepts two arguments - name/id of discord user you want to give the role "
+            embed.add_field(name="!give_role",
+                            value="This command accepts two arguments - name/id of discord user you want to give the "
+                                  "role "
                                   "to, and **exact** name of the role you want to give them.",
                             inline=False)
+            embed.add_field(name="!delete_permissions_for_all_rooms",
+                            value="**DANGEROUS** \n Deletes all permissions in "
+                                  "all rooms for every member in the server.\n"
+                                  "**Use with caution**",
+                            inline=False)
+            embed.add_field(name="!remove_roles_from_all_users",
+                            value="**DANGEROUS** \n Removes all roles from every user on the server. \n"
+                                  "**Use with caution**",
+                            inline=False)
 
-        embed.add_field(name="week", value="Returns number of the study week", inline=False)
+
         await ctx.message.author.send(embed=embed)
 
     @bot.command()

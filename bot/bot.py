@@ -15,9 +15,8 @@ bot = commands.Bot(command_prefix='!', help_command=None, intents=intents)
 
 def init_bot():
     try:
-        bot.run(bot_token)
-
         init_events(bot)
         init_commands(bot)
+        bot.run(bot_token)
     except Exception as ex:
         logging.error("Error while starting: " + str(ex))
