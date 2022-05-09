@@ -147,12 +147,6 @@ def init_commands(bot):
     @bot.command()
     @commands.has_role("Mod")
     async def delete_permissions_for_all_rooms(ctx):  # deletes permissions for all roles and members in all rooms.
-        roles_to_remove = []
-        for role in ctx.guild.roles:
-            if role.name.startswith("Mod") or role.name.startswith("SubMod") or role.name.startswith(
-                    "Verified") or role.name.startswith("Unverified"):
-                roles_to_remove.append(role)
-
         overwrite = discord.PermissionOverwrite()
         overwrite.send_messages = False
         overwrite.read_messages = False
