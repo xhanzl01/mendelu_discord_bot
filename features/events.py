@@ -23,22 +23,39 @@ def init_events(bot):
         await welcome_channel.send(f"{member.mention} just joined the server! Can they verify though?")
 
         # send verification guide
-        verify_embed = discord.Embed(title="",
+        en_verify_embed = discord.Embed(title="",
                                      description="**Use both commands in the #verify channel on the server. DO NOT send "
                                                  "commands to the bot directly!\n\n** "
-                                                 "To get started type !verify xname@mendelu.cz userid - where "
+                                                 "To get started type `!verify xlogin@mendelu.cz userid` - where "
                                                  "xname@mendelu.cz is your university email and userid your ID Number on "
                                                  "your ISIC.\n\nThe bot will send you an email with a verification token "
                                                  "\n\n"
                                                  "After you receive the token use command !token *your token*.\n\n"
                                                  "If you did everything correctly, the bot will grant you permission to "
-                                                 "the server",
+                                                 "the server. Now head to the #zařazení channel and use reactions to get"
+                                                 "roles of your year of studies and study program."
+                                                 ,
                                      colour=discord.Color.green())
-        verify_embed.set_author(name="Verification",
+        en_verify_embed.set_author(name="Verification",
                                 icon_url="https://cdn4.iconfinder.com/data/icons/basic-ui-colour/512/ui-41-512.png")
-        verify_embed.set_footer(
-            text="If something goes wrong, write a message to one of the moderators (Koty97#6663, Ragnar#1517, Fouss#3807).")
-        await member.send(embed=verify_embed)
+        en_verify_embed.set_footer(
+            text="**If you cannot verify, send message to Fouss#3807**.")
+
+        cz_verify_embed = discord.Embed(title="",
+                                     description="**Použij oba příkazy v kanále #verify. NEPOSÍLEJ příkazy botovi do zpráv!\n\n** "
+                                                 "Začni tak, že napíšeš `!verify xlogin@mendelu.cz UID` kde xlogin@mendelu.cz je"
+                                                 "tvůj univerzitní email a UID je ID na tvém ISICu (to kratší, né ISIC"
+                                                 "card number začínající S 420..., toto číslo můžeš najít i na svém profilu v ISU)."
+                                                 "\n\nBot ti pak pošle na tvůj univerzitní email token. Pokud ho nevidíš, koukni do spamu."
+                                                 "\n\n"
+                                                 "Jakmile dostaneš token napiš `!token *tvůj token*`.\n\n"
+                                                 "Pokud jsi udělal vše správně, měl bys dostat roli *Verified*, zamiř"
+                                                 "pak do kanálu #zařazení a vyklikej si pomocí reakcí ročník a obor.\n",
+                                     colour=discord.Color.green())
+        cz_verify_embed.set_footer(
+            text="**Pokud se ti nedaří se verifikovat, prosím napiš zprávu Fouss#3807**")
+        await member.send(embed=en_verify_embed)
+        await member.send(embed=cz_verify_embed)
 
     @bot.event
     async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
