@@ -66,8 +66,7 @@ def return_all_students_in_db():
     return students
 
 
-
-def get_token(discord_id):
+def get_student_by_discord_id(discord_id):
     query = "SELECT * FROM students WHERE discord_id = ?"
     data = [discord_id]
     cur.execute(query, data)
@@ -79,7 +78,7 @@ def update_studies(db_row, updated_arg, discord_id_arg):
     query = f"""UPDATE students SET {db_row} = ? WHERE discord_id = ?"""
     data = [updated_arg, discord_id_arg]
     cur.execute(query, data)
-    logging.info("Change of student info: " + get_token(discord_id_arg))
+    logging.info(f"Student in the db has been updated {get_student_by_discord_id(discord_id_arg)}")
     conn.commit()
 
 

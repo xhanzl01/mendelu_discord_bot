@@ -45,36 +45,33 @@ def init_events(bot):
         # is user trying to get permissions to rooms?
         message: discord.Message = await bot.get_channel(payload.channel_id).fetch_message(
             payload.message_id)  # message that is reacted to
-        try:
-            channel: discord.TextChannel = bot.get_channel(payload.channel_id)  # channel that the reaction was added in
-            reaction = get(message.reactions, emoji=payload.emoji.name)
-            guild: discord.guild = bot.get_guild(payload.guild_id)
-            if channel.name == "classification":
-                messages = str.split(message.content, "\n")
+        channel: discord.TextChannel = bot.get_channel(payload.channel_id)  # channel that the reaction was added in
+        reaction = get(message.reactions, emoji=payload.emoji.name)
+        guild: discord.guild = bot.get_guild(payload.guild_id)
+        if channel.name == "zařazení":
+            messages = str.split(message.content, "\n")
 
-                for msg in messages:
-                    # is this channel in the channel pool
-                    emoji = str.split(msg)[0]
-                    if str(emoji) == str(payload.emoji):
-                        await add_classification(guild, msg, payload.member)
-                        await reaction.remove(payload.member)
-            elif channel.name == "rooms":
-                messages = str.split(message.content, "\n")
+            for msg in messages:
+                # is this channel in the channel pool
+                emoji = str.split(msg)[0]
+                if str(emoji) == str(payload.emoji):
+                    await add_classification(guild, msg, payload.member)
+                    await reaction.remove(payload.member)
+                    return
+        elif channel.name == "rooms":
+            messages = str.split(message.content, "\n")
 
-                for msg in messages:
-                    # is this channel in the channel pool
-                    emoji = str.split(msg)[0]
-                    if str(emoji) == str(payload.emoji):
-                        await add_permission_to_room(guild, msg, channel, payload.member)
-                        return
-            elif str(payload.emoji.name) == "Thanks":
-                # todo karma
-                pass
-            else:
-                return
-        except Exception as ex:
-            logging.error(f"reaction error in channel {message.channel.name} on message\n {message.content}\n"
-                          f" with reaction {payload.emoji.name}\n" + str(ex))
+            for msg in messages:
+                # is this channel in the channel pool
+                emoji = str.split(msg)[0]
+                if str(emoji) == str(payload.emoji):
+                    await add_permission_to_room(guild, msg, channel, payload.member)
+                    return
+        elif str(payload.emoji.name) == "Thanks":
+            # todo karma
+            pass
+        else:
+            return
 
     @bot.event
     async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
@@ -103,7 +100,7 @@ def init_events(bot):
 
     @bot.event
     async def on_member_update(before, after):
-        promotion_channel = get(before.guild.channels, name="new-promotions")
+        promotion_channel = get(before.guild.channels, id=972436866940936212)
         if "Unverified" in before.roles and "Verified" in after.roles:
             await promotion_channel.send(f"{after.mention} just verified and can use the server now!")
         if "BcOI" in after.roles:

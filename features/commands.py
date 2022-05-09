@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 
 from verification import verification
-from db.db import check_for_existing_uid, insert_new_student, return_all_students_in_db, get_token
+from db.db import check_for_existing_uid, insert_new_student, return_all_students_in_db, get_student_by_discord_id
 
 
 def init_commands(bot):
@@ -100,7 +100,7 @@ def init_commands(bot):
                 "an error, please contact `F0uss#3807`.\n"
                 "If you do not have a token, please first use !verify command to get one.")
         else:
-            student = get_token(ctx.message.author.id)[0]
+            student = get_student_by_discord_id(ctx.message.author.id)[0]
             if len(student) == 0:
                 await ctx.message.author.send(
                     "It seems like you did not verify. Please head over to the #verify channel and "

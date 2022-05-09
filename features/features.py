@@ -35,22 +35,26 @@ async def add_classification(guild: discord.Guild, msg, member: discord.Member):
     ari = get(guild.roles, name="ARI")
     oi = get(guild.roles, name="OI")
     aii = get(guild.roles, name="AII")
+    bcoi = get(guild.roles, name="BcOI")
+    ei = get(guild.roles, name="EI")
 
     wanted_role_name = str.split(msg)[1]
     wanted_role = get(guild.roles, name=wanted_role_name)
-    try:
-        if wanted_role_name == "Prvák":
-            await member.remove_roles(prvak, druhak, tretak, lajdak)
-            update_studies("year_of_studies", 1, member.id)
-        elif wanted_role_name == "Druhák":
-            await member.remove_roles(prvak, druhak, tretak, lajdak)
-            update_studies("year_of_studies", 2, member.id)
-        elif wanted_role_name == "Třeťák":
-            await member.remove_roles(prvak, druhak, tretak, lajdak)
-            update_studies("year_of_studies", 3, member.id)
-        elif wanted_role_name == "ARI" or wanted_role_name == "OI" or wanted_role_name == "AII":
-            update_studies("program", wanted_role_name, member.id)
-            await member.remove_roles(ari, oi, aii)
-        await member.add_roles(wanted_role)  # give member the role
-    except Exception as ex:
-        logging.error(ex)
+    if wanted_role_name == "Prvák":
+        await member.remove_roles(prvak, druhak, tretak, lajdak)
+        update_studies("year_of_studies", 1, member.id)
+    elif wanted_role_name == "Druhák":
+        await member.remove_roles(prvak, druhak, tretak, lajdak)
+        update_studies("year_of_studies", 2, member.id)
+    elif wanted_role_name == "Třeťák":
+        await member.remove_roles(prvak, druhak, tretak, lajdak)
+        update_studies("year_of_studies", 3, member.id)
+    elif wanted_role.id == "ARI" or wanted_role_name == "OI" or wanted_role_name == "AII" or wanted_role_name == "EI" or wanted_role_name == "BcOI" or wanted_role_name == "EI":
+        await member.remove_roles(ari)
+        await member.remove_roles(oi)
+        await member.remove_roles(aii)
+        await member.remove_roles(ei)
+        await member.remove_roles(bcoi)
+        update_studies("program", wanted_role_name, member.id)
+
+    await member.add_roles(wanted_role)  # give member the role
