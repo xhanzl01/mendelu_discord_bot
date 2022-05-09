@@ -161,9 +161,6 @@ def init_commands(bot):
             for member in ctx.guild.members:
                 await channel.set_permissions(member, overwrite=overwrite)  # delete permissions in room for member
                 logging.info(s + f"for member {member}")
-            for role in ctx.guild.roles:
-                await channel.set_permissions(role, overwrite=overwrite)  # delete permissions in room for role
-                logging.info(s + f"for role {role}")
 
     @bot.command()
     @commands.has_role("Mod")
