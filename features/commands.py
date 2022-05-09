@@ -167,10 +167,10 @@ def init_commands(bot):
     async def remove_roles_from_all_users(ctx):  # removes all roles in all members
 
         for role in ctx.guild.roles:
-            if not (role.name.startswith("Mod") or role.name.startswith("SubMod") or role.name.startswith("Verified")
+            if not ((role.name.startswith("Mod") or role.name.startswith("SubMod") or role.name.startswith("Verified")
                     or role.name.startswith("Unverified") or role.name.startswith("@everyone")
                     or role.name.startswith("PEFNet 2.0") or role.name.startswith("PEFNet 2.0")
-                    or role.name.startswith("MendeluBot") or role.name.lower().startswith("bot")):
+                    or role.name.startswith("MendeluBot") or role.name.lower().startswith("bot")) or role.id == 623559270272729089 or role.id == 681469634750578692 or role.id == 623561113107169321 or role.id == 972419067375923264 or role.id == 680298068020822072):
                 for member in ctx.guild.members:
                     logging.info(f"Removing role {role} from member {member}")
                     await member.remove_roles(role)  # remove role from member
