@@ -108,12 +108,13 @@ def init_events(bot):
             channel_name = str.split(msg)[1]
             if str(emoji) == str(payload.emoji):
                 channel = get(bot.get_guild(payload.guild_id).channels, name=channel_name)
-                overwrite = channel.overwrites_for(verified_role)
-                # set only the user who reacted to see this channel
-                overwrite.send_messages = False
-                overwrite.read_messages = False
-                await channel.set_permissions(user, overwrite=overwrite)
-                return
+                if channel:
+                    overwrite = channel.overwrites_for(verified_role)
+                    # set only the user who reacted to see this channel
+                    overwrite.send_messages = False
+                    overwrite.read_messages = False
+                    await channel.set_permissions(user, overwrite=overwrite)
+                    return
 
     @bot.event
     async def on_member_update(before, after):
