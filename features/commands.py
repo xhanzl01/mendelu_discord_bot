@@ -4,7 +4,8 @@ import discord
 from discord.ext import commands
 
 from verification import verification
-from db.db import check_for_existing_uid, insert_new_student, return_all_students_in_db, get_student_by_discord_id
+from db.db import check_for_existing_uid, insert_new_student, return_all_students_in_db, get_student_by_discord_id, \
+    insert_into_student
 
 
 def init_commands(bot):
@@ -33,6 +34,11 @@ def init_commands(bot):
                                   "role "
                                   "to, and **exact** name of the role you want to give them.",
                             inline=False)
+            embed.add_field(name="!insert_into_student",
+                            value="Insert a new student into db.\n"
+                                  "This command needs these arguments in this exact order:\n"
+                                  "`name, surname, login, discord_id, uid`",
+                            inline=False)
             embed.add_field(name="!delete_permissions_for_all_rooms",
                             value="**DANGEROUS** \n Deletes all permissions in "
                                   "all rooms for every member in the server.\n"
@@ -42,7 +48,6 @@ def init_commands(bot):
                             value="**DANGEROUS** \n Removes all roles from every user on the server. \n"
                                   "**Use with caution**",
                             inline=False)
-
 
         await ctx.message.author.send(embed=embed)
 
@@ -162,9 +167,10 @@ def init_commands(bot):
 
         for role in ctx.guild.roles:
             if not ((role.name.startswith("Mod") or role.name.startswith("SubMod") or role.name.startswith("Verified")
-                    or role.name.startswith("Unverified") or role.name.startswith("@everyone")
-                    or role.name.startswith("PEFNet 2.0") or role.name.startswith("PEFNet 2.0")
-                    or role.name.startswith("MendeluBot") or role.name.lower().startswith("bot")) or role.id == 623559270272729089 or role.id == 681469634750578692 or role.id == 623561113107169321 or role.id == 972419067375923264 or role.id == 680298068020822072):
+                     or role.name.startswith("Unverified") or role.name.startswith("@everyone")
+                     or role.name.startswith("PEFNet 2.0") or role.name.startswith("PEFNet 2.0")
+                     or role.name.startswith("MendeluBot") or role.name.lower().startswith(
+                        "bot")) or role.id == 623559270272729089 or role.id == 681469634750578692 or role.id == 623561113107169321 or role.id == 972419067375923264 or role.id == 680298068020822072):
 
                 for member in ctx.guild.members:
                     if role in member.roles:
@@ -174,3 +180,8 @@ def init_commands(bot):
     @bot.command()
     async def ping(ctx):
         await ctx.send("pong")
+
+    @bot.command()
+    @commands.has_any_role("Mod", "SubMod")
+    async def add_to_db(ctx, name, surname, login, discord_id, uid):
+        insert_into_student(name, surname, login, discord_id, uid)

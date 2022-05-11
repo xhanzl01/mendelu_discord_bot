@@ -3,7 +3,6 @@ import logging
 import sqlite3
 from config import data_fouss
 
-
 conn = sqlite3.connect("db/students.db")
 cur = conn.cursor()
 """
@@ -98,3 +97,13 @@ def migrate_old_db_data():
     rows = csv.reader(data_file)
     cur.executemany("INSERT INTO students VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
     conn.commit()
+
+
+def insert_into_student(name, surname,login, discord_id, uid):
+    query = f"""INSERT INTO students(name,surname,discord_id,login, uid, year_of_studies, program, verification_token, karma)
+                VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)"""
+    data = [name, surname, discord_id, login, uid, 0, "", 0, 0]
+    cur.execute(query, data)
+    conn.commit()
+    get_student_by_discord_id(discord_id)
+    logging.info(f"Inserting new student{get_student_by_discord_id(discord_id)}")
