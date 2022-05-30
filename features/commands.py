@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 
 from verification import verification
-from db.db import check_for_existing_uid, insert_new_student, return_all_students_in_db, get_student_by_discord_id, \
+from db.db import check_for_existing_uid, insert_new_student, get_student_by_discord_id, \
     insert_into_student
 
 
@@ -16,7 +16,7 @@ def init_commands(bot):
             return
         await user.add_roles(role)
 
-    # Overloading help command TODO FINISH
+    # Overloading help command
     @bot.command(pass_context=True)
     @commands.has_any_role("Verified", "Unverified")
     async def help(ctx):

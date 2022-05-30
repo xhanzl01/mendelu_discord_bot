@@ -26,7 +26,6 @@ def send_mail(receiver, token):
     text = "Here is your verification code: " + str(token)
     message = MIMEMultipart()
     message["Subject"] = "MENDELU Discord Verification"
-    # This doesnt seem to work
     message["From"] = "bot@mendeludiscord.com"
     message["To"] = receiver
 

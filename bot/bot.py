@@ -9,7 +9,7 @@ from features.events import init_events
 intents = discord.Intents.all()
 discord.member = True
 
-bot_token = "OTUxNTQwNTc3NDU4MDkwMDg1.Yio9OA.VlMspAKfMSBI2erNTtbAvhz5vfg"
+bot_token = "insert your token here"
 bot = commands.Bot(command_prefix='!', help_command=None, intents=intents)
 
 
